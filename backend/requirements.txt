@@ -6,3 +6,5 @@ psycopg2-binary  # Jeśli używasz PostgreSQL
 mysqlclient      # Jeśli używasz MySQL
 dj-database-url
 whitenoise
+drf-yasg==1.21.7
+
