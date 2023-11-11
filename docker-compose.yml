@@ -9,3 +9,16 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=production
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./backend/EaterNet:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
