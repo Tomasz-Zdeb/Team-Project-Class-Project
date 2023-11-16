@@ -3,7 +3,6 @@ import Card from "../components/card";
 
 const performLogin = async (login: string, password: string) => {
 	console.log("login:", login, "password:", password);
-
 	// TODO: make api call here
 };
 
@@ -20,6 +19,7 @@ export default function Login() {
 						<input
 							className="py-3 px-2 w-full rounded-md"
 							value={login}
+							aria-label="login"
 							onChange={(e) => setLogin(e.target.value)}
 						></input>
 					</div>
@@ -29,6 +29,7 @@ export default function Login() {
 							className="py-3 px-2 w-full rounded-md"
 							type="password"
 							value={password}
+							aria-label="password"
 							onChange={(e) => setPassword(e.target.value)}
 						></input>
 					</div>
