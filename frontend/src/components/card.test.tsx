@@ -1,7 +1,7 @@
 import { expect, test, describe } from "vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Card from "./card";
+import Card from "./Card";
 
 describe("Card", () => {
 	test("should render children", () => {
