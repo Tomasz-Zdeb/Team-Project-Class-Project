@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Time({
+export default function Clock({
 	className = "",
 	...props
 }: React.HTMLAttributes<HTMLSpanElement>) {
@@ -14,7 +14,7 @@ export default function Time({
 	}, []);
 
 	return (
-		<span className={`font-mono ` + className} {...props}>
+		<span className={`font-mono ` + className} {...props} title="clock">
 			{time}
 		</span>
 	);
