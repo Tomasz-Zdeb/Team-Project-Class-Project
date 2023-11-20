@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Card from "../components/card";
+import Card from "../components/Card";
 
 const performLogin = async (login: string, password: string) => {
 	console.log("login:", login, "password:", password);

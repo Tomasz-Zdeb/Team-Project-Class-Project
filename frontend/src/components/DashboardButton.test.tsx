@@ -1,21 +1,21 @@
 import { expect, test, describe } from "vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Card from "./Card";
+import DashboardButton from "./DashboardButton";
 
-describe("Card", () => {
+describe("Dashboardubtton", () => {
 	test("should render children", () => {
-		render(<Card>Test</Card>);
+		render(<DashboardButton>Test</DashboardButton>);
 		expect(screen.getByText("Test")).toBeInTheDocument();
 	});
 
 	test("should render className", () => {
-		render(<Card className="test">Test</Card>);
+		render(<DashboardButton className="test">Test</DashboardButton>);
 		expect(screen.getByText("Test")).toHaveClass("test");
 	});
 
 	test("should render other props", () => {
-		render(<Card id="test">Test</Card>);
+		render(<DashboardButton id="test">Test</DashboardButton>);
 		expect(screen.getByText("Test")).toHaveAttribute("id", "test");
 	});
 });
