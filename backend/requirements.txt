@@ -1,12 +1,10 @@
-Django>=3.0,<4.0
+Django>=4.0,<4.3
 djangorestframework
 gunicorn
 django-environ
-psycopg2-binary  # Jeśli używasz PostgreSQL
-mysqlclient      # Jeśli używasz MySQL
+mysqlclient     
 dj-database-url
 whitenoise
 drf-yasg==1.21.7
 django-cors-headers
 djangorestframework-simplejwt
-

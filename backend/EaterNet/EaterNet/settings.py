@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%6i7)*6qr#y1egqj9v52wcaiy$%1xv0iozxb-eu04)*f=yzj(9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -98,8 +98,12 @@ WSGI_APPLICATION = 'EaterNet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'eaternet',
+        'USER': 'backend',
+        'PASSWORD': 'restauracja',
+        'HOST': 'db',
+        'PORT': '3306',
     }
 }
 

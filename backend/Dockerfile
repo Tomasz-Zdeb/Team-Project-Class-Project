@@ -8,8 +8,8 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Skopiuj pozostałe pliki projektu do katalogu roboczego
-COPY . .
+# Skopiuj katalog EaterNet (zawierający manage.py i check_db.py) do katalogu roboczego
+COPY EaterNet/ ./EaterNet
 
 # Ustaw zmienne środowiskowe
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -18,5 +18,8 @@ ENV PYTHONUNBUFFERED 1
 # Otwórz port, na którym będzie nasłuchiwał serwer Django
 EXPOSE 8000
 
-# Uruchom serwer Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Ustaw katalog EaterNet jako katalog roboczy
+WORKDIR /app/EaterNet
+
+# Uruchom skrypt czekający na bazę danych, a następnie serwer Django
+CMD ["sh", "-c", "python check_db.py && python manage.py runserver 0.0.0.0:8000"]
