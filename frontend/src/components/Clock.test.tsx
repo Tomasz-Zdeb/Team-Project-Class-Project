@@ -4,7 +4,7 @@ import Clock from "./Clock";
 
 describe("Clock", () => {
 	const mockDate = new Date(2022, 1, 1, 12, 0, 0);
-	global.Date = vi.fn(() => mockDate) as unknown as DateConstructor;
+	vi.setSystemTime(mockDate);
 
 	test("renders the current time", () => {
 		render(<Clock />);
