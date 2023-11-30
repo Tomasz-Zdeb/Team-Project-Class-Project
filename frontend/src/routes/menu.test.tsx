@@ -4,41 +4,48 @@ import { describe, expect, test } from "vitest";
 import Menu from "./menu";
 
 describe("Menu", () => {
-	test("renders menu buttons correctly", () => {
+	test("renders menu elements correctly", () => {
 		render(<Menu />);
 
-		const orderButton = screen.getByText("Zamów");
-		expect(orderButton).toBeInTheDocument();
+		const addButton = screen.getByText("Dodaj");
+		expect(addButton).toBeInTheDocument();
 
-		const resetButton = screen.getByText("Reset");
-		expect(resetButton).toBeInTheDocument();
+		const nameInput = screen.getByPlaceholderText("Nazwa");
+		expect(nameInput).toBeInTheDocument();
+
+		const priceInput = screen.getByPlaceholderText("Cena");
+		expect(priceInput).toBeInTheDocument();
+		expect(priceInput).toHaveAttribute("type", "number");
 	});
 
-	test("adds item to cart when clicked on plus button", () => {
+	test("adds items to menu", () => {
 		render(<Menu />);
-		const plusButton = screen.getAllByLabelText("Add to cart")[0];
-		fireEvent.click(plusButton);
-		const cartItem = screen.getAllByLabelText("Cart item")[0];
-		expect(cartItem).toBeInTheDocument();
+		const addButton = screen.getByText("Dodaj");
+		const nameInput = screen.getByPlaceholderText("Nazwa");
+		const priceInput = screen.getByPlaceholderText("Cena");
+
+		fireEvent.change(nameInput, { target: { value: "Test" } });
+		fireEvent.change(priceInput, { target: { value: "10" } });
+		fireEvent.click(addButton);
+
+		const menuItem = screen.getByText("Test");
+		expect(menuItem).toBeInTheDocument();
 	});
 
-	test("removes item from cart when clicked on minus button", () => {
+	test("removes items from menu", () => {
 		render(<Menu />);
-		const plusButton = screen.getAllByLabelText("Add to cart")[0];
-		fireEvent.click(plusButton);
-		const minusButton = screen.getAllByLabelText("Remove from cart")[0];
-		fireEvent.click(minusButton);
-		const cartItem = screen.queryAllByLabelText("Cart item")[0];
-		expect(cartItem).toBeUndefined();
-	});
+		const addButton = screen.getByText("Dodaj");
+		const nameInput = screen.getByPlaceholderText("Nazwa");
+		const priceInput = screen.getByPlaceholderText("Cena");
 
-	test("reset button clears cart", () => {
-		render(<Menu />);
-		const plusButton = screen.getAllByLabelText("Add to cart")[0];
-		fireEvent.click(plusButton);
-		const resetButton = screen.getByText("Reset");
-		fireEvent.click(resetButton);
-		const cartItem = screen.queryAllByLabelText("Cart item")[0];
-		expect(cartItem).toBeUndefined();
+		fireEvent.change(nameInput, { target: { value: "Test" } });
+		fireEvent.change(priceInput, { target: { value: "10" } });
+		fireEvent.click(addButton);
+
+		const removeButton = screen.getAllByTitle("Usuń").pop();
+		fireEvent.click(removeButton as HTMLElement);
+
+		const menuItem = screen.queryByText("Test");
+		expect(menuItem).toBeNull();
 	});
 });
