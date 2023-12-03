@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { MenuItem } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+	faTrashCan,
+	faPencil,
+	faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 
 function fetchMenu() {
 	// TODO: Fetch menu from backend
@@ -30,7 +34,7 @@ function fetchMenu() {
 		{
 			id: 5,
 			name: "Pozycja 5",
-			price: 10,
+			price: 10.2,
 		},
 		{
 			id: 6,
@@ -50,6 +54,16 @@ export default function Menu() {
 
 	const [newItemName, setNewItemName] = useState<string>("");
 	const [newItemPrice, setNewItemPrice] = useState<number>(0);
+
+	const [currentlyEditing, setCurrentlyEditing] = useState<number | null>(
+		null
+	);
+
+	const [currentlyEditingName, setCurrentlyEditingName] =
+		useState<string>("");
+
+	const [currentlyEditingPrice, setCurrentlyEditingPrice] =
+		useState<number>(0);
 
 	useEffect(() => {
 		setMenu(fetchMenu());
@@ -82,6 +96,32 @@ export default function Menu() {
 		// TODO: Add item to backend
 	}
 
+	function handleEdit() {
+		if (
+			currentlyEditingName === "" ||
+			currentlyEditingPrice === 0 ||
+			!currentlyEditingPrice
+		)
+			return;
+
+		const newMenu = menu.map((item) => {
+			if (item.id === currentlyEditing) {
+				return {
+					id: item.id,
+					name: currentlyEditingName,
+					price: currentlyEditingPrice,
+				};
+			} else {
+				return item;
+			}
+		});
+
+		setMenu(newMenu);
+		setCurrentlyEditing(null);
+
+		// TODO: Edit item in backend
+	}
+
 	return (
 		<div className="overflow-auto border-2 border-slate-600 h-full rounded-lg">
 			<div className="overflow-auto flex">
@@ -95,29 +135,30 @@ export default function Menu() {
 					</thead>
 					<tbody>
 						<tr className="border-b-2 border-b-muted">
-							<td className="p-2">
+							<td>
 								<input
 									type="text"
-									className="w-full p-2 border-2 border-slate-600 rounded-lg"
+									className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
 									placeholder="Nazwa"
 									onChange={(e) =>
 										setNewItemName(e.target.value)
 									}
 								/>
 							</td>
-							<td className="p-2">
+							<td>
 								<input
 									type="number"
-									className="w-full p-2 border-2 border-slate-600 rounded-lg"
+									step="0.01"
+									className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
 									placeholder="Cena"
 									onChange={(e) =>
 										setNewItemPrice(
-											parseInt(e.target.value)
+											parseFloat(e.target.value)
 										)
 									}
 								/>
 							</td>
-							<td className="p-2">
+							<td>
 								<div className="flex justify-center">
 									<button
 										className="py-4 px-8 bg-green-500 text-white"
@@ -141,21 +182,95 @@ export default function Menu() {
 									key={item.id}
 									className="text-center odd:bg-gray-200"
 								>
-									<td>{item.name}</td>
-									<td>{item.price} zł</td>
-									<td className="p-2">
-										<button
-											className="py-4 px-8"
-											onClick={() =>
-												handleDelete(item.id)
-											}
-											title="Usuń"
-										>
-											<FontAwesomeIcon
-												icon={faTrashCan}
-												className="text-red-500 text-4xl"
+									<td>
+										{currentlyEditing === item.id ? (
+											<input
+												type="text"
+												className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
+												value={currentlyEditingName}
+												onChange={(e) =>
+													setCurrentlyEditingName(
+														e.target.value
+													)
+												}
+												title={
+													"Edytuj nazwę " + item.name
+												}
 											/>
-										</button>
+										) : (
+											item.name
+										)}
+									</td>
+									<td>
+										{currentlyEditing === item.id ? (
+											<input
+												type="number"
+												className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
+												value={currentlyEditingPrice}
+												onChange={(e) =>
+													setCurrentlyEditingPrice(
+														parseFloat(
+															e.target.value
+														)
+													)
+												}
+												title={
+													"Edytuj cenę " + item.name
+												}
+											/>
+										) : (
+											item.price.toFixed(2) + "zł"
+										)}
+									</td>
+
+									<td className="p-2">
+										<div className="flex gap-2 justify-center">
+											{currentlyEditing === item.id ? (
+												<button
+													className="py-4 w-32"
+													onClick={() => handleEdit()}
+													title="Zapisz"
+												>
+													<FontAwesomeIcon
+														icon={faCheck}
+														className="text-green-500 text-4xl"
+													/>
+												</button>
+											) : (
+												<button
+													className="py-4 w-32"
+													onClick={() => {
+														setCurrentlyEditing(
+															item.id
+														);
+														setCurrentlyEditingName(
+															item.name
+														);
+														setCurrentlyEditingPrice(
+															item.price
+														);
+													}}
+													title={"Edytuj"}
+												>
+													<FontAwesomeIcon
+														icon={faPencil}
+														className="text-4xl text-muted"
+													/>
+												</button>
+											)}
+											<button
+												className="py-4 w-32"
+												onClick={() =>
+													handleDelete(item.id)
+												}
+												title="Usuń"
+											>
+												<FontAwesomeIcon
+													icon={faTrashCan}
+													className="text-red-500 text-4xl"
+												/>
+											</button>
+										</div>
 									</td>
 								</tr>
 							);
