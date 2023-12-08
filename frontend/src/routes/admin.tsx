@@ -140,7 +140,7 @@ function UserTab() {
 		// TODO: Edit item in backend
 	}
 
-	function handleAddUser(login: string, password: string, role: string) {
+	function handleAddUser(login: string, _: string, role: string) {
 		setUsers([
 			...users,
 			{
@@ -156,8 +156,6 @@ function UserTab() {
 				role: role,
 			},
 		]);
-
-		// TODO: Add user to backend
 	}
 
 	return (
