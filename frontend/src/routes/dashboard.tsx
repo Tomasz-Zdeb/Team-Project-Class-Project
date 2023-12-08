@@ -1,6 +1,7 @@
 import {
 	faArrowRightFromBracket,
 	faUtensils,
+	faGears,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,14 @@ export default function Dashboard() {
 			>
 				<FontAwesomeIcon icon={faUtensils} className="text-muted" />
 				<span>Menu</span>
+			</DashboardButton>
+			<DashboardButton
+				onClick={() => {
+					navigate("/admin");
+				}}
+			>
+				<FontAwesomeIcon icon={faGears} className="text-muted" />
+				<span>Zarządzanie</span>
 			</DashboardButton>
 			<DashboardButton
 			// TODO: add logout functionality

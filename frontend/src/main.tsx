@@ -6,6 +6,7 @@ import "./index.css";
 import Layout from "./layout";
 import Dashboard from "./routes/dashboard";
 import Menu from "./routes/menu";
+import Admin from "./routes/admin";
 
 const router = createBrowserRouter([
 	{
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
 			{
 				path: "/menu",
 				element: <Menu />,
+			},
+			{
+				path: "/admin",
+				element: <Admin />,
 			},
 		],
 	},
