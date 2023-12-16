@@ -54,7 +54,7 @@ function AddUserModal(props: {
 							<input
 								className="py-3 px-2 w-full rounded-md"
 								value={login}
-								aria-label="login"
+								title="Login"
 								onChange={(e) => setLogin(e.target.value)}
 							></input>
 						</div>
@@ -64,7 +64,7 @@ function AddUserModal(props: {
 								className="py-3 px-2 w-full rounded-md"
 								type="password"
 								value={password}
-								aria-label="password"
+								title="Hasło"
 								onChange={(e) => setPassword(e.target.value)}
 							></input>
 						</div>
@@ -73,7 +73,7 @@ function AddUserModal(props: {
 							<input
 								className="py-3 px-2 w-full rounded-md"
 								value={role}
-								aria-label="role"
+								title="Rola"
 								onChange={(e) => setRole(e.target.value)}
 							></input>
 						</div>
