@@ -1,7 +1,8 @@
 import {
 	faArrowRightFromBracket,
 	faUtensils,
-	faGears,
+  faGears,
+  faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +13,14 @@ export default function Dashboard() {
 
 	return (
 		<div className="flex flex-wrap gap-4 justify-center items-center w-full h-full">
+			<DashboardButton
+				onClick={() => {
+					navigate("/order");
+				}}
+			>
+				<FontAwesomeIcon icon={faShoppingCart} className="text-muted" />
+				<span>Zamów</span>
+			</DashboardButton>
 			<DashboardButton
 				onClick={() => {
 					navigate("/menu");
