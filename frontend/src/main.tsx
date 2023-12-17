@@ -7,6 +7,7 @@ import Layout from "./layout";
 import Dashboard from "./routes/dashboard";
 import Order from "./routes/order";
 import Menu from "./routes/menu";
+import Admin from "./routes/admin";
 
 const router = createBrowserRouter([
 	{
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
 			{
 				path: "/menu",
 				element: <Menu />,
+			},
+			{
+				path: "/admin",
+				element: <Admin />,
 			},
 		],
 	},
