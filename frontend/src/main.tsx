@@ -5,6 +5,7 @@ import Login from "./routes/login";
 import "./index.css";
 import Layout from "./layout";
 import Dashboard from "./routes/dashboard";
+import Order from "./routes/order";
 import Menu from "./routes/menu";
 
 const router = createBrowserRouter([
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
 			{
 				index: true,
 				element: <Dashboard />,
+			},
+			{
+				path: "/order",
+				element: <Order />,
 			},
 			{
 				path: "/menu",
