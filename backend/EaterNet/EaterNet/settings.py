@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 # Application definition
 

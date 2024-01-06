@@ -2,9 +2,12 @@ Django>=4.0,<4.3
 djangorestframework
 gunicorn
 django-environ
-mysqlclient     
+mysqlclient
 dj-database-url
 whitenoise
 drf-yasg==1.21.7
 django-cors-headers
 djangorestframework-simplejwt
+
+
+
