@@ -31,73 +31,102 @@ function fetchUsers() {
 }
 
 function AddUserModal(props: {
-	onAdd: (login: string, password: string, role: string) => void;
-	closeModal: () => void;
+  onAdd: (login: string, password: string, role: string) => void;
+  closeModal: () => void;
 }) {
-	const [login, setLogin] = useState<string>("");
-	const [password, setPassword] = useState<string>("");
-	const [role, setRole] = useState<string>("");
+  const [login, setLogin] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-	function handleAdd() {
-		if (login === "" || password === "" || role === "") return;
+  async function handleAdd() {
+    if (login === "" || password === "") {
+      alert("Login i hasło nie mogą być puste!");
+      return;
+    }
 
-		props.onAdd(login, password, role);
-	}
+    const role = isAdmin ? "Administrator" : "User";
+    const isStaff = isAdmin;
 
-	return (
-		<div className="fixed w-full h-full left-0 top-0">
-			<div className="flex flex-col items-center justify-center h-full">
-				<Card className="bg-[#f5f5f5]">
-					<div className="flex flex-col gap-6 w-full grow">
-						<div className="flex flex-col gap-1">
-							<h1>Login</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								value={login}
-								title="Login"
-								onChange={(e) => setLogin(e.target.value)}
-							></input>
-						</div>
-						<div className="flex flex-col gap-1">
-							<h1>Hasło</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								type="password"
-								value={password}
-								title="Hasło"
-								onChange={(e) => setPassword(e.target.value)}
-							></input>
-						</div>
-						<div className="flex flex-col gap-1">
-							<h1>Rola</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								value={role}
-								title="Rola"
-								onChange={(e) => setRole(e.target.value)}
-							></input>
-						</div>
-						<div className="grow w-full">
-							<button
-								className="py-4 w-full"
-								onClick={() => handleAdd()}
-							>
-								<h1>Dodaj</h1>
-							</button>
-						</div>
-						<div className="grow w-full">
-							<button
-								className="py-4 w-full"
-								onClick={() => props.closeModal()}
-							>
-								<h1>Anuluj</h1>
-							</button>
-						</div>
-					</div>
-				</Card>
-			</div>
-		</div>
-	);
+    try {
+      const response = await fetch('http://localhost:8000/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: login,
+          password: password,
+          is_staff: isStaff,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await response.json(); // Jeśli nie potrzebujesz danych z odpowiedzi
+      props.onAdd(login, password, role); // Możesz chcieć aktualizować stan użytkowników tutaj
+      props.closeModal(); //
+    } catch (error) {
+      console.error("Wystąpił problem z rejestracją użytkownika: ", error);
+      // Możesz tu wyświetlić błąd użytkownikowi
+    }
+  }
+
+  return (
+    <div className="fixed w-full h-full left-0 top-0">
+      <div className="flex flex-col items-center justify-center h-full">
+        <Card className="bg-[#f5f5f5]">
+          <div className="flex flex-col gap-6 w-full grow">
+            <div className="flex flex-col gap-1">
+              <h1>Login</h1>
+              <input
+                className="py-3 px-2 w-full rounded-md"
+                value={login}
+                title="Login"
+                onChange={(e) => setLogin(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1>Hasło</h1>
+              <input
+                className="py-3 px-2 w-full rounded-md"
+                type="password"
+                value={password}
+                title="Hasło"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1>Rola</h1>
+              <label style={{ fontSize: '24px', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={isAdmin}
+                  onChange={(e) => setIsAdmin(e.target.checked)}
+                  style={{ width: '20px', height: '20px', marginRight: '10px', verticalAlign: 'middle' }}
+                />
+                {" "}Użytkownik jest administratorem
+              </label>
+            </div>
+            <div className="grow w-full">
+              <button className="py-4 w-full" onClick={handleAdd}>
+                <h1>Dodaj</h1>
+              </button>
+            </div>
+            <div className="grow w-full">
+              <button
+                className="py-4 w-full"
+                onClick={() => props.closeModal()}
+              >
+                <h1>Anuluj</h1>
+              </button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
 }
 
 function UserTab() {
@@ -127,7 +156,7 @@ function UserTab() {
 				return {
 					id: user.id,
 					login: user.login,
-					role: currentlyEditingRole,
+					role: currentlyEditingRole === "Administrator" ? "Administrator" : "User",
 				};
 			} else {
 				return user;
@@ -193,22 +222,26 @@ function UserTab() {
 										<td>{item.login}</td>
 										<td>
 											{currentlyEditing === item.id ? (
-												<input
-													type="text"
-													className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
-													value={currentlyEditingRole}
-													onChange={(e) =>
-														setCurrentlyEditingRole(
-															e.target.value
-														)
-													}
-													title={
-														"Edytuj rolę " +
-														item.role
-													}
-												/>
+												<>
+													<input
+														type="checkbox"
+														style={{ width: "20px", height: "20px" }} // Zmiana rozmiaru checkboxa
+														checked={currentlyEditingRole === "Administrator"}
+														onChange={(e) =>
+															setCurrentlyEditingRole(
+																e.target.checked ? "Administrator" : "User"
+															)
+														}
+														title={
+															"Edytuj rolę " + item.role
+														}
+													/>
+													<span className="ml-2" style={{ fontSize: "24px" }}>
+														Użytkownik jest administratorem
+													</span>
+												</>
 											) : (
-												item.role
+												item.role === "Administrator" ? "Administrator" : "User"
 											)}
 										</td>
 										<td className="p-2">

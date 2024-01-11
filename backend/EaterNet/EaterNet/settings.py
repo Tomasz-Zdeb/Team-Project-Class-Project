@@ -30,8 +30,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 
 # Application definition
 
@@ -104,7 +102,7 @@ DATABASES = {
         'NAME': 'eaternet',
         'USER': 'backend',
         'PASSWORD': 'restauracja',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -150,3 +148,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        },
+    },
+}
