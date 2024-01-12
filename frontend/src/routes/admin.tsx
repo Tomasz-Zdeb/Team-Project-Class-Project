@@ -7,27 +7,39 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 
+
+type RawUser = {
+  id: number;
+  username: string;
+  is_staff: boolean;
+};
+
 type User = {
 	id: number;
 	login: string;
 	role: string;
 };
 
-function fetchUsers() {
-	// TODO: Fetch users from backend
+async function fetchUsers(): Promise<User[]> {
+  try {
+    const response = await fetch('http://localhost:8000/users/');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const rawUsersData: RawUser[] = await response.json();
 
-	return [
-		{
-			id: 1,
-			login: "admin",
-			role: "admin",
-		},
-		{
-			id: 2,
-			login: "test",
-			role: "user",
-		},
-	];
+    // Przekształć dane z backendu na frontowy typ User
+    const transformedUsers: User[] = rawUsersData.map(rawUser => ({
+      id: rawUser.id,
+      login: rawUser.username,
+      role: rawUser.is_staff ? 'Administrator' : 'User',
+    }));
+
+    return transformedUsers;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error; // Rzucanie błędu może być lepsze, aby móc go obsłużyć na wyższym poziomie
+  }
 }
 
 function AddUserModal(props: {
@@ -64,12 +76,17 @@ function AddUserModal(props: {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      await response.json(); // Jeśli nie potrzebujesz danych z odpowiedzi
-      props.onAdd(login, password, role); // Możesz chcieć aktualizować stan użytkowników tutaj
-      props.closeModal(); //
+      const responseData = await response.json();
+
+      if (responseData.username === login) {
+        alert("Użytkownik został utworzony!");
+      }
+
+      props.onAdd(login, password, role);
+      props.closeModal();
     } catch (error) {
       console.error("Wystąpił problem z rejestracją użytkownika: ", error);
-      // Możesz tu wyświetlić błąd użytkownikowi
+      alert("Wystąpił błąd podczas rejestracji użytkownika. Spróbuj ponownie później.");
     }
   }
 
@@ -129,6 +146,8 @@ function AddUserModal(props: {
   );
 }
 
+
+
 function UserTab() {
 	const [users, setUsers] = useState<User[]>([]);
 	const [addUserModalOpen, setAddUserModalOpen] = useState<boolean>(false);
@@ -138,36 +157,70 @@ function UserTab() {
 	const [currentlyEditingRole, setCurrentlyEditingRole] =
 		useState<string>("");
 
-	useEffect(() => {
-		setUsers(fetchUsers());
-	}, []);
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const fetchedUsers = await fetchUsers();
+        setUsers(fetchedUsers);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    }
+
+    loadUsers(); // Wywołanie funkcji asynchronicznej wewnątrz useEffect
+  }, []);
 
 	function handleDelete(id: number) {
-		setUsers(users.filter((user) => user.id !== id));
+    // Send a DELETE request to the server
+    fetch(`http://localhost:8000/users/${id}/`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
 
-		// TODO: Delete user from backend
-	}
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Handle response errors
+            throw new Error('Network response was not ok');
+        }
 
-	function handleEdit() {
-		if (currentlyEditingRole === "") return;
+        setUsers(users.filter((user) => user.id !== id));
+        console.log(`User with id ${id} deleted successfully.`);
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+}
 
-		const newUsers = users.map((user) => {
-			if (user.id === currentlyEditing) {
-				return {
-					id: user.id,
-					login: user.login,
-					role: currentlyEditingRole === "Administrator" ? "Administrator" : "User",
-				};
-			} else {
-				return user;
-			}
-		});
 
-		setUsers(newUsers);
-		setCurrentlyEditing(null);
 
-		// TODO: Edit item in backend
-	}
+function handleEdit(userId: number, role: string) {
+  // Wysyłamy żądanie PUT do serwera
+  fetch(`http://localhost:8000/users/${userId}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ is_staff: role === "Administrator" }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      // Obsługa błędów w odpowiedzi
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(updatedUser => {
+    console.log('User updated successfully:', updatedUser);
+    // Aktualizacja stanu użytkowników na froncie
+    setUsers(users.map(user => user.id === userId ? { ...user, role: updatedUser.is_staff ? "Administrator" : "User" } : user));
+    setCurrentlyEditing(null); // Zakończenie trybu edycji
+  })
+  .catch(error => {
+    console.error('There was a problem with your fetch operation:', error);
+  });
+}
 
 	function handleAddUser(login: string, _: string, role: string) {
 		setUsers([
@@ -251,7 +304,7 @@ function UserTab() {
 													<button
 														className="py-4 w-32"
 														onClick={() =>
-															handleEdit()
+															handleEdit(item.id, currentlyEditingRole)
 														}
 														title="Zapisz"
 													>
