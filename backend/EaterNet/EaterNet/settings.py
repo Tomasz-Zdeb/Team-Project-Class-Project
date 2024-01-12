@@ -106,7 +106,7 @@ DATABASES = {
         'NAME': 'eaternet',
         'USER': 'backend',
         'PASSWORD': 'restauracja',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '3306',
     }
 }

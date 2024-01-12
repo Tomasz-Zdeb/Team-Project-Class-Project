@@ -11,7 +11,7 @@ def check_db():
             user="backend",
             passwd="restauracja",
             db="eaternet",
-            port=3306
+            port=3307,
         )
         print("Database is ready!")
         return True
