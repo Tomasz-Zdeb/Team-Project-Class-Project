@@ -1,31 +1,37 @@
 from django.db import models
-
 from django.core.validators import MinValueValidator
-from django.db import models
-from django.contrib.auth.models import User
 
-class Product(models.Model):
-    name = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
-    is_available = models.BooleanField(default=True)
+class MenuItem(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Nazwa')
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Cena',
+        validators=[MinValueValidator(0)]
+    )
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Pozycja menu'
+        verbose_name_plural = 'Pozycje menu'
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    # Dodatkowe pola jak status zamówienia, łączna kwota, etc.
+    menu_items = models.ManyToManyField(MenuItem, verbose_name='Pozycje menu')
+    table_number = models.IntegerField(
+        verbose_name='Numer stolika',
+        validators=[MinValueValidator(1)],
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Data utworzenia')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Data aktualizacji')
 
     def __str__(self):
-        return f"Order {self.id} by {self.user}"
+        item_names = ', '.join([item.name for item in self.menu_items.all()])
+        return f"Order {self.id} at table {self.table_number} containing: {item_names}"
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(validators=[MinValueValidator(1)])
-
-    def __str__(self):
-        return f"{self.quantity} of {self.product.name}"
+    class Meta:
+        verbose_name = 'Zamówienie'
+        verbose_name_plural = 'Zamówienia'
