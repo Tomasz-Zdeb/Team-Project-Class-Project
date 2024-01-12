@@ -67,50 +67,52 @@ const AdminRoute = ({ children }: ProtectedRouteProps) => {
 
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Layout />,
-        children: [
-            {
-                index: true,
-                element: (
-                    <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "order",
-                element: (
-                    <ProtectedRoute>
-                        <Order />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "menu",
-                element: (
-                    <ProtectedRoute>
-                        <Menu />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "admin",
-                element: (
-                    <ProtectedRoute>
-                        <AdminRoute>
-                            <Admin />
-                        </AdminRoute>
-                    </ProtectedRoute>
-                ),
-            },
-        ],
-    },
-    {
-        path: "/login",
-        element: <Login />,
-    },
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "order",
+        element: (
+          <ProtectedRoute>
+            <Order />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "menu",
+        element: (
+          <ProtectedRoute>
+            <Menu />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "admin",
+        element: (
+          <AdminRoute>
+            <Admin />
+          </AdminRoute>
+        ),
+      },
+    ],
+  },
 ]);
 
 const rootElement = document.getElementById("root");

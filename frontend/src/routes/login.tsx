@@ -36,7 +36,7 @@ const performLogin = async (login: string, password: string, navigate: (path: st
             console.log('Login successful:', data);
             localStorage.setItem('accessToken', data.access);
             localStorage.setItem('refreshToken', data.refresh);
-            navigate('/');
+            navigate('/dashboard');
         }
     } catch (error: unknown) {
         if (error instanceof Error) {
