@@ -47,7 +47,6 @@ function OrderSummary({
     };
 
     const total = calculateTotal();
-
     return (
         <div className="flex flex-col h-full">
             {!ordered ? (
@@ -58,6 +57,7 @@ function OrderSummary({
                             title="Podsumowanie - suma zamówienia"
                         >
                             <span>Suma:</span>
+
                             <span>{total} zł</span>
                         </div>
                         <div className="flex gap-4 items-center">
