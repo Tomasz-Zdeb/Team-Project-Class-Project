@@ -1,7 +1,8 @@
-import { describe } from "vitest";
+import { describe, test } from "vitest";
 
 
 describe("Menu", () => {
+    test("empty", () => {});
 /*
     test("renders order management buttons correctly", () => {
         render(<Order />);
@@ -40,6 +41,5 @@ describe("Menu", () => {
         const cartItem = screen.queryAllByLabelText("Cart item")[0];
         expect(cartItem).toBeUndefined();
     });
-<<<<<<< HEAD
 */
 });
