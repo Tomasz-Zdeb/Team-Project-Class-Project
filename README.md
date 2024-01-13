@@ -154,5 +154,11 @@ Dlatego aby uniknąć dodatkowych *commitów* mówiących jedynie o tym, że w d
 ## Dokumentacja Techniczna
 
 <div align="center">
-Na razie pusto 😉
+### Uruchamianie aplikacji
+
+Aby lokalnie uruchomić aplikację internetową należy wykonać następujące kroki:
+1.	Sklonuj repozytorium z GitHuba: https://github.com/Tomasz-Zdeb/Team-Project-Class-Project
+2.	Zbuduj kontener za pomocą polecenia docker-compose up
+3.	Uzyskaj dostęp do aplikacji w przeglądarce internetowej pod adresem: http://localhost:3000/
+
 </div>
