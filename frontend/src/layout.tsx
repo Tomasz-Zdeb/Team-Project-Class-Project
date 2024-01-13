@@ -15,7 +15,7 @@ export default function Layout() {
 					<button
 						className="text-4xl p-6"
 						onClick={() => {
-							navigate("/");
+							navigate("/dashboard");
 						}}
 					>
 						<FontAwesomeIcon

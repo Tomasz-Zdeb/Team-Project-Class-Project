@@ -9,56 +9,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { MenuItem } from "../types";
 
+// Zaktualizowana funkcja fetchMenu
 function fetchMenu() {
-    // TODO: Fetch menu from backend
-
-    return [
-        {
-            id: 1,
-            name: "Pozycja 1",
-            price: 10,
-        },
-        {
-            id: 2,
-            name: "Pozycja 2",
-            price: 10,
-        },
-        {
-            id: 3,
-            name: "Pozycja 3",
-            price: 10,
-        },
-        {
-            id: 4,
-            name: "Pozycja 4",
-            price: 10,
-        },
-        {
-            id: 5,
-            name: "Pozycja 5",
-            price: 10,
-        },
-        {
-            id: 6,
-            name: "Pozycja 6",
-            price: 10,
-        },
-        {
-            id: 7,
-            name: "Pozycja 7",
-            price: 300000,
-        },
-    ];
+    return fetch('http://localhost:8000/menuitems/')
+        .then(response => response.json())
+        .catch(error => console.error("Fetch error:", error));
 }
 
 function OrderSummary({
     order,
     setCart,
     setOrderSummaryView,
+    menu
 }: {
     order: Record<number, number>;
     setCart: (value: Record<number, number>) => void;
     setOrderSummaryView: (value: boolean) => void;
+    menu: MenuItem[];
 }) {
     const [ordered, setOrdered] = useState(false);
     const [tableNumber, setTableNumber] = useState<number | null>(null);
@@ -72,6 +39,14 @@ function OrderSummary({
         }, 500);
     };
 
+    const calculateTotal = () => {
+        return Object.entries(order).reduce((acc, [id, count]) => {
+            const item = menu.find(item => item.id === Number(id));
+            return item ? acc + item.price * count : acc;
+        }, 0);
+    };
+
+    const total = calculateTotal();
     return (
         <div className="flex flex-col h-full">
             {!ordered ? (
@@ -82,21 +57,8 @@ function OrderSummary({
                             title="Podsumowanie - suma zamówienia"
                         >
                             <span>Suma:</span>
-                            <span>
-                                {Object.entries(order).reduce(
-                                    (acc, [id, count]) => {
-                                        const item = fetchMenu().find(
-                                            (item) => item.id === Number(id)
-                                        );
-                                        if (!item) {
-                                            return acc;
-                                        }
-                                        return acc + item.price * count;
-                                    },
-                                    0
-                                )}{" "}
-                                zł
-                            </span>
+
+                            <span>{total} zł</span>
                         </div>
                         <div className="flex gap-4 items-center">
                             <span>Numer stolika:</span>
@@ -171,7 +133,9 @@ export default function Order() {
     };
 
     useEffect(() => {
-        setMenu(fetchMenu());
+        fetchMenu().then(data => {
+            setMenu(data);
+        });
     }, []);
 
     return (
@@ -231,7 +195,6 @@ export default function Order() {
                                 })}
                             </tbody>
                         </table>
-                        <div className="grow" />
                     </div>
                     <div className="flex flex-col gap-2 col-span-3 overflow-auto">
                         <div className="overflow-auto flex flex-col grow row-span-4 w-full border-2 border-slate-600 rounded-md">
@@ -253,7 +216,7 @@ export default function Order() {
                                     zł
                                 </span>
                             </div>
-                            <table className="overflow-auto table-fixed">
+                            <table className="table-fixed">
                                 <tbody>
                                     {menu.map((item) => {
                                         if (cart[item.id] > 0) {
@@ -277,9 +240,7 @@ export default function Order() {
                                     })}
                                 </tbody>
                             </table>
-                            <div className="grow" />
                         </div>
-
                         <div className="flex flex-col gap-2 justify-end">
                             <button
                                 className="w-full p-2 flex flex-col gap-2 text-green"
@@ -307,6 +268,7 @@ export default function Order() {
                     order={cart}
                     setCart={setCart}
                     setOrderSummaryView={setOrderSummaryView}
+                    menu={menu}
                 />
             )}
         </>

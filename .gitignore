@@ -1,0 +1,30 @@
+# Pliki i katalogi Django
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
+*.pot
+*.egg-info/
+dist/
+build/
+*.mo
+*.bak
+*.swp
+
+# Pliki i katalogi frontendowe (np. React)
+/node_modules/
+/build/
+/dist/
+/.cache/
+.DS_Store
+.env
+
+# Pliki konfiguracyjne środowiska Pythona
+*.pyc
+__pycache__/
+
+# Katalogi i pliki IDE PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws

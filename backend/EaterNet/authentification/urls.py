@@ -1,7 +1,14 @@
 from django.urls import path
 from . import views
+from .views import UserRegistrationView, UserListView, AdminAccessCheckView
+
 
 urlpatterns = [
      path('home/', views.HomeView.as_view(), name ='home'),
-     path('logout/', views.LogoutView.as_view(), name ='logout')
+     path('logout/', views.LogoutView.as_view(), name ='logout'),
+     path('register/', UserRegistrationView.as_view(), name='register'),
+     path('users/', views.UserListView.as_view(), name='user-list'),
+     path('users/<int:pk>/', views.UserListView.as_view(), name='user-detail'),
+     path('admin-access-check/', AdminAccessCheckView.as_view(), name='admin-access-check'),
+
 ]

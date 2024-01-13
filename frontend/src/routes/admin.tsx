@@ -7,98 +7,146 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 
+
+type RawUser = {
+  id: number;
+  username: string;
+  is_staff: boolean;
+};
+
 type User = {
 	id: number;
 	login: string;
 	role: string;
 };
 
-function fetchUsers() {
-	// TODO: Fetch users from backend
+async function fetchUsers(): Promise<User[]> {
+  try {
+    const response = await fetch('http://localhost:8000/users/');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const rawUsersData: RawUser[] = await response.json();
 
-	return [
-		{
-			id: 1,
-			login: "admin",
-			role: "admin",
-		},
-		{
-			id: 2,
-			login: "test",
-			role: "user",
-		},
-	];
+    // Przekształć dane z backendu na frontowy typ User
+    const transformedUsers: User[] = rawUsersData.map(rawUser => ({
+      id: rawUser.id,
+      login: rawUser.username,
+      role: rawUser.is_staff ? 'Administrator' : 'User',
+    }));
+
+    return transformedUsers;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error; // Rzucanie błędu może być lepsze, aby móc go obsłużyć na wyższym poziomie
+  }
 }
 
 function AddUserModal(props: {
-	onAdd: (login: string, password: string, role: string) => void;
-	closeModal: () => void;
+  onAdd: (login: string, password: string, role: string) => void;
+  closeModal: () => void;
 }) {
-	const [login, setLogin] = useState<string>("");
-	const [password, setPassword] = useState<string>("");
-	const [role, setRole] = useState<string>("");
+  const [login, setLogin] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-	function handleAdd() {
-		if (login === "" || password === "" || role === "") return;
+  async function handleAdd() {
+    if (login === "" || password === "") {
+      alert("Login i hasło nie mogą być puste!");
+      return;
+    }
 
-		props.onAdd(login, password, role);
-	}
+    const role = isAdmin ? "Administrator" : "User";
+    const isStaff = isAdmin;
 
-	return (
-		<div className="fixed w-full h-full left-0 top-0">
-			<div className="flex flex-col items-center justify-center h-full">
-				<Card className="bg-[#f5f5f5]">
-					<div className="flex flex-col gap-6 w-full grow">
-						<div className="flex flex-col gap-1">
-							<h1>Login</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								value={login}
-								title="Login"
-								onChange={(e) => setLogin(e.target.value)}
-							></input>
-						</div>
-						<div className="flex flex-col gap-1">
-							<h1>Hasło</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								type="password"
-								value={password}
-								title="Hasło"
-								onChange={(e) => setPassword(e.target.value)}
-							></input>
-						</div>
-						<div className="flex flex-col gap-1">
-							<h1>Rola</h1>
-							<input
-								className="py-3 px-2 w-full rounded-md"
-								value={role}
-								title="Rola"
-								onChange={(e) => setRole(e.target.value)}
-							></input>
-						</div>
-						<div className="grow w-full">
-							<button
-								className="py-4 w-full"
-								onClick={() => handleAdd()}
-							>
-								<h1>Dodaj</h1>
-							</button>
-						</div>
-						<div className="grow w-full">
-							<button
-								className="py-4 w-full"
-								onClick={() => props.closeModal()}
-							>
-								<h1>Anuluj</h1>
-							</button>
-						</div>
-					</div>
-				</Card>
-			</div>
-		</div>
-	);
+    try {
+      const response = await fetch('http://localhost:8000/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: login,
+          password: password,
+          is_staff: isStaff,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      if (responseData.username === login) {
+        alert("Użytkownik został utworzony!");
+      }
+
+      props.onAdd(login, password, role);
+      props.closeModal();
+    } catch (error) {
+      console.error("Wystąpił problem z rejestracją użytkownika: ", error);
+      alert("Wystąpił błąd podczas rejestracji użytkownika. Spróbuj ponownie później.");
+    }
+  }
+
+  return (
+    <div className="fixed w-full h-full left-0 top-0">
+      <div className="flex flex-col items-center justify-center h-full">
+        <Card className="bg-[#f5f5f5]">
+          <div className="flex flex-col gap-6 w-full grow">
+            <div className="flex flex-col gap-1">
+              <h1>Login</h1>
+              <input
+                className="py-3 px-2 w-full rounded-md"
+                value={login}
+                title="Login"
+                onChange={(e) => setLogin(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1>Hasło</h1>
+              <input
+                className="py-3 px-2 w-full rounded-md"
+                type="password"
+                value={password}
+                title="Hasło"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1>Rola</h1>
+              <label style={{ fontSize: '24px', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={isAdmin}
+                  onChange={(e) => setIsAdmin(e.target.checked)}
+                  style={{ width: '20px', height: '20px', marginRight: '10px', verticalAlign: 'middle' }}
+                />
+                {" "}Użytkownik jest administratorem
+              </label>
+            </div>
+            <div className="grow w-full">
+              <button className="py-4 w-full" onClick={handleAdd}>
+                <h1>Dodaj</h1>
+              </button>
+            </div>
+            <div className="grow w-full">
+              <button
+                className="py-4 w-full"
+                onClick={() => props.closeModal()}
+              >
+                <h1>Anuluj</h1>
+              </button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
 }
+
+
 
 function UserTab() {
 	const [users, setUsers] = useState<User[]>([]);
@@ -109,36 +157,70 @@ function UserTab() {
 	const [currentlyEditingRole, setCurrentlyEditingRole] =
 		useState<string>("");
 
-	useEffect(() => {
-		setUsers(fetchUsers());
-	}, []);
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const fetchedUsers = await fetchUsers();
+        setUsers(fetchedUsers);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    }
+
+    loadUsers(); // Wywołanie funkcji asynchronicznej wewnątrz useEffect
+  }, []);
 
 	function handleDelete(id: number) {
-		setUsers(users.filter((user) => user.id !== id));
+    // Send a DELETE request to the server
+    fetch(`http://localhost:8000/users/${id}/`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
 
-		// TODO: Delete user from backend
-	}
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Handle response errors
+            throw new Error('Network response was not ok');
+        }
 
-	function handleEdit() {
-		if (currentlyEditingRole === "") return;
+        setUsers(users.filter((user) => user.id !== id));
+        console.log(`User with id ${id} deleted successfully.`);
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+}
 
-		const newUsers = users.map((user) => {
-			if (user.id === currentlyEditing) {
-				return {
-					id: user.id,
-					login: user.login,
-					role: currentlyEditingRole,
-				};
-			} else {
-				return user;
-			}
-		});
 
-		setUsers(newUsers);
-		setCurrentlyEditing(null);
 
-		// TODO: Edit item in backend
-	}
+function handleEdit(userId: number, role: string) {
+  // Wysyłamy żądanie PUT do serwera
+  fetch(`http://localhost:8000/users/${userId}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ is_staff: role === "Administrator" }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      // Obsługa błędów w odpowiedzi
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(updatedUser => {
+    console.log('User updated successfully:', updatedUser);
+    // Aktualizacja stanu użytkowników na froncie
+    setUsers(users.map(user => user.id === userId ? { ...user, role: updatedUser.is_staff ? "Administrator" : "User" } : user));
+    setCurrentlyEditing(null); // Zakończenie trybu edycji
+  })
+  .catch(error => {
+    console.error('There was a problem with your fetch operation:', error);
+  });
+}
 
 	function handleAddUser(login: string, _: string, role: string) {
 		setUsers([
@@ -193,22 +275,26 @@ function UserTab() {
 										<td>{item.login}</td>
 										<td>
 											{currentlyEditing === item.id ? (
-												<input
-													type="text"
-													className="w-full p-2 border-2 border-slate-600 rounded-lg m-2"
-													value={currentlyEditingRole}
-													onChange={(e) =>
-														setCurrentlyEditingRole(
-															e.target.value
-														)
-													}
-													title={
-														"Edytuj rolę " +
-														item.role
-													}
-												/>
+												<>
+													<input
+														type="checkbox"
+														style={{ width: "20px", height: "20px" }} // Zmiana rozmiaru checkboxa
+														checked={currentlyEditingRole === "Administrator"}
+														onChange={(e) =>
+															setCurrentlyEditingRole(
+																e.target.checked ? "Administrator" : "User"
+															)
+														}
+														title={
+															"Edytuj rolę " + item.role
+														}
+													/>
+													<span className="ml-2" style={{ fontSize: "24px" }}>
+														Użytkownik jest administratorem
+													</span>
+												</>
 											) : (
-												item.role
+												item.role === "Administrator" ? "Administrator" : "User"
 											)}
 										</td>
 										<td className="p-2">
@@ -218,7 +304,7 @@ function UserTab() {
 													<button
 														className="py-4 w-32"
 														onClick={() =>
-															handleEdit()
+															handleEdit(item.id, currentlyEditingRole)
 														}
 														title="Zapisz"
 													>
