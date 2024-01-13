@@ -40,5 +40,6 @@ describe("Menu", () => {
         const cartItem = screen.queryAllByLabelText("Cart item")[0];
         expect(cartItem).toBeUndefined();
     });
+<<<<<<< HEAD
 */
 });
